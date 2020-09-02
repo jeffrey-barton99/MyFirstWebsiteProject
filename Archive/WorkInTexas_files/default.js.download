@@ -1,0 +1,1288 @@
+﻿//***************************************************************************
+//
+// Create onload event to call focus to signin or keyword box
+// Create onload event to add target to external links
+// Create onload event to swap news items
+//#284303 pld
+// #311060 DCC 09/17/2015 removng $.browser bc it is deprecated and function bc it is no longer needed using .NET 4.5
+// #359457 PLD 11/03/2016 adding code for new universal search in keyword check.
+// #362223 PLA 12/01/2016 added internship type job search support
+// #362223 PLA 12/09/2016 modified internship type job search
+// #371895 JC  02/15/2017 SEC fix
+// #381517 TLH 05/08/2017 Corrected mWhereto, changed to mWhereTo
+// #385487 PLD 07/25/2017 Added txtPassword_mobile
+// #383350 MAT 08/08/2017 Edited homeUnivSearch function to accept id=stdntJobSearchWidget as a value to display a student page
+// #454033 TLH 10/23/2018 Added search by number to homeUnivSearch
+// #474348 JC  01/25/2019 Added ADA updates to the _target links.
+// #468180 TLH 01/29/2019 Added posted date to home page search.
+// #487743 PLA 04/26/2019 Commented out code in setdefaultbutton function
+// #513742 CRS 09/02/2019 Deadwood Silverlight detection
+//****************************************************************************
+
+$(document).ready(function () {
+    addTargets();
+    swapNews();
+    signinHandle();
+    handleIframe();
+
+    $(function () {  //#219947  Remove (# jobs) from Job Search autocomplete
+        $("#search_button").on( "click", function () {
+            //removes "(1 job)", (2 jobs), etc from keyword
+            var value = $("#txtKeyword").val();
+            if (value == null)
+            {
+                value = $("#univsearchtxtkeyword").val();
+            }
+            if (value != null) {
+                if (value.indexOf("(") > 0) {
+                    $("#txtKeyword").val($.trim(value.substring(0, value.indexOf("("))));
+                }
+            }
+        });
+    });
+
+    //This is for AJAX postbacks (FF Ready)
+    if (Sys) {
+        function appl_init() {
+            var pgRegMgr = Sys.WebForms.PageRequestManager.getInstance();
+            pgRegMgr.add_endRequest(EndHandler);
+        }
+
+        Sys.Application.add_init(appl_init);
+    }
+
+    // Internet Explorer 6-11
+    var isIE = /*@cc_on!@*/false || !!document.documentMode;
+    if (!isIE) {
+        $("input[type=password]").each(function (index, element) {
+            $(element).on( "keypress", function (e) {
+                ClearCapsLockWarning(element);
+                if (isCapsLockOn(e)) {
+                    ShowCapsLockWarning(index, element);
+                }
+            });
+        });
+        $('html').on('keyup', function (e) { 
+            if (e.keyCode == 20) {
+                $('#capslock').hide();
+            }
+        });
+    }
+
+    // Alert for Internet Explorer 6-10 users
+    var ieOldVer = (!!window.ActiveXObject && +(/msie\s(\d+)/i.exec(navigator.userAgent)[1])) || NaN;
+    if (ieOldVer < 11) {
+        var lang = 'E';
+        sessionStorage.setItem('BadIE', 'true');
+        if (window.location.href.indexOf('plang=') > -1) {
+            lang = window.location.href.slice(window.location.href.indexOf('plang=') + 6);
+        }
+        if (lang === 'E') {
+            alert("Your version of Internet Explorer does not meet the minimum requirements for this website.");
+        }
+        if (lang === 'S') {
+            alert("Su versión de Internet Explorer no cumple con los requisitos mínimos de este sitio web.");
+        }
+        if (lang === 'H') {
+            alert("Vèsyon Internet Explorer ou an pa satisfè egzijans minimòm pou sit wèb sa a.");
+        }
+        window.location.href = getRoot() + 'vosnet/settings.aspx?ie=bad&plang=' + lang;
+    }
+
+    $('.stdnt-search').on('keyup click', '.master-input-text', function () {
+        var input = $(this).val();
+        if (input) {
+            $('.stdnt-search .list-group').find(':first-child').html('Search for <b>' + input + '</b> in');
+            $('.stdnt-search .list-group').show();
+        } else {
+            $('.stdnt-search .list-group').hide();
+        }
+    })
+
+    // Hide the drop-down on clicking outside the input element
+    $('.stdnt-search').on('focusout', '.master-input-text', function () {
+        $('.stdnt-search .list-group').hide();
+    })
+
+    // Attach query param on clicking on any drop-down link
+    $('.stdnt-search')
+        .on('mousedown', '.list-group .list-group-item', function () { return false; }) // hides focusout event on 'master-input-text'
+        .on('click', '.list-group .list-group-item', function () {
+            var append = '?';
+            if (this.href.indexOf('?') > 0) {
+                append = '&';
+            }
+            this.href = this.href + append + 'mastersearchinput=' + $('.stdnt-search .master-input-text').val();
+    })
+
+    $("a[href^='https://www.geographicsolutions.com'").hide();//560209
+
+});
+
+
+function EndHandler() {
+    addTargets();
+    swapNews();
+    signinHandle();
+}
+
+function signinHandle() {
+    if ($('#txtPassword').val() == '') {
+        $('#txtPassword').hide();
+        $('#txtPassword2').show();
+    }
+
+    //Clear out textbox
+    $('#txtPassword2').on("focus", function () {
+        $('#txtPassword2').hide();
+        $('#txtPassword').show();
+        $('#txtPassword').trigger("focus");
+    });
+
+    //Re-add value to the textbox if empty 
+    $('#txtPassword').on("blur", function () {
+        if (this.value == '') {
+            $('#txtPassword').hide();
+            $('#txtPassword2').show();
+        }
+    });
+    //mobile one too
+    if ($('#txtPassword_mobile').val() == '') {
+        $('#txtPassword_mobile').hide();
+        $('#txtPassword2_mobile').show();
+    }
+
+    //Clear out textbox
+    $('#txtPassword2_mobile').on("focus", function () {
+        $('#txtPassword2_mobile').hide();
+        $('#txtPassword_mobile').show();
+        $('#txtPassword_mobile').trigger("focus");
+    });
+
+    //Re-add value to the textbox if empty 
+    $('#txtPassword_mobile').on("blur", function () {
+        if (this.value == '') {
+            $('#txtPassword_mobile').hide();
+            $('#txtPassword2_mobile').show();
+        }
+    });
+
+
+}
+
+//***************************************************************************
+//
+// Add target attribute to links that need to open in new window
+//
+//***************************************************************************
+
+function addTargets() {
+    if (typeof addTargetsVCC === "function") {
+        return;
+    }
+    var aryLinks = $('.link_external');
+    if (aryLinks.length > 0) {
+        var strLangCheck = 'E';
+        if ($('#opgLanguage').length > 0)
+            strLangCheck = $('#opgLanguage').val();
+
+        for (var i = 0; i < aryLinks.length; ++i) {
+            var $currLink = $(aryLinks[i]),
+                currentTitle = $currLink.attr("title");
+                currentAriaLabel = $currLink.attr("aria-label");
+            
+            // Check for spanish theme
+            if (strLangCheck == 'S') {
+                if (typeof (currentTitle) != "undefined") {
+                    $currLink.attr("title", currentTitle + " (Se abrir\341 en una nueva ventana del navegador)");
+                } else {
+                    $currLink.attr("title", " Se abrir\341 en una nueva ventana del navegador");
+                }
+                if (typeof (currentAriaLabel) != "undefined") {
+                    $currLink.attr("aria-label", currentAriaLabel + " (Se abrir\341 en una nueva ventana del navegador)");
+                } else {
+                    $currLink.attr("aria-label", $currLink.attr("title"));
+                }
+            } else {
+                if (typeof (currentTitle) != "undefined") {
+                    $currLink.attr("title", currentTitle + " (Opens in new browser window)");
+                } else {
+                    $currLink.attr("title", " Opens in new browser window");
+                }
+                if (typeof (currentAriaLabel) != "undefined") {
+                    $currLink.attr("aria-label", currentAriaLabel + " (Opens in new browser window)");
+                } else {
+                    $currLink.attr("aria-label", $currLink.attr("title"));
+                }
+            }
+            $currLink.attr("target", "_blank");
+            
+        }
+    }
+}
+
+//***************************************************************************
+//
+// Change user settings - Spanish Mode and Text Mode
+//
+//***************************************************************************
+function changeSettings(theSetting, newValue) {  
+
+    switch (theSetting) {
+        case 'Language':
+            //PLD 278977
+            //            if ($('#hdnLanguage').length == 0) {
+            //                $('<input>').attr({
+            //                    type: 'hidden',
+            //                    id: 'hdnLanguage',
+            //                    name: 'hdnLanguage',
+            //                    value: newValue
+            //                }).appendTo('form');
+            //            }
+            //            else {
+            //                $('#hdnLanguage').val(newValue);
+            //            }
+            var hlang = document.getElementById('hdnLanguage');
+            if (hlang != null) {
+                hlng.value = newValue;
+            }
+            //window.location.search = '?plang=' + newValue; //this created a postback
+            var maction = document.forms[0].action;
+            if (maction.indexOf('?') < 1) {
+                document.forms[0].action += '?plang=' + newValue;
+            } else {
+                var mndx;
+                var newaction;
+                mndx = maction.indexOf('?');
+                newaction = maction.substring(0, mndx);
+                newaction = newaction + '?plang=' + newValue;
+                document.forms[0].action = newaction;
+            }
+            document.location.search = '?plang=' + newValue;
+            //END PLD 278977
+            break;
+
+        case 'Theme':
+            if ($('#hdnTheme').length == 0) {
+                $('<input>').attr({
+                    type: 'hidden',
+                    id: 'hdnTheme',
+                    name: 'hdnTheme',
+                    value: newValue
+                }).appendTo('form');
+            }
+            else {
+                $('#hdnTheme').val(newValue);
+            }
+            var el = Boolean(window.opera) ? $("html") : $("html, body");
+            el.animate({ scrollTop: 0 }, 200);
+            break;
+    }
+}
+
+//***************************************************************************
+//
+// Keyword Search Box
+//
+//***************************************************************************
+function setSearchGeography() {
+    var zip = "";
+    var radius = "";
+    var frm = document.getElementById("frmSearch");
+    var extraOptions = "{ extraParams: {appendTotalToTitle: 1 ";
+    if (frm) {
+        zip = frm.zip.value;
+        radius = frm.radius[frm.radius.selectedIndex].value;
+        extraOptions += ", zip:'" + escape(zip) + "', ";
+        if (radius != "") {
+            extraOptions += "radius:" + escape(radius);
+        }
+        else {
+            extraOptions += "radius: 10"
+        }
+    }
+    extraOptions += " }}"
+    var evalstr = '$("#keyword").setOptions(' + extraOptions + ')';
+    eval(evalstr);
+}
+
+//***************************************************************************
+//
+// Keyword Search Box
+//
+//***************************************************************************
+function jobSearchCheck() {
+    var $enteredKw = $('#txtKeyword'),
+        $enteredCity = $('#txtCity'),
+        $enteredZip = $('#txtZip'),
+        $enteredEmp = $('#txtEmployerName'),
+        $selRadius = $('#ddlRadius');
+    var cityWatermarkText, keywordWatermarkText, zipWatermarkText;
+    var trueorfalse = true;
+    
+    if ($enteredKw.length > 0 && ($enteredCity.length > 0 || $enteredZip.length > 0) && $selRadius.length > 0) {
+        var kwVal = $.trim($enteredKw.val()),
+            cityVal = $.trim($enteredCity.val()),
+            zipVal = $.trim($enteredZip.val()),
+            empVal = $.trim($enteredEmp.val()),
+            radiusVal = $selRadius.val();
+
+		// Determine if input field uses "Enter Keyword" or "Keyword (e.g. Accountant)" & City GH - 7/20/2012
+        if (kwVal == getLangString('EnterKey')) { 
+			keywordWatermarkText = getLangString('EnterKey');
+        }
+        else {
+			keywordWatermarkText = getLangString('KeywordLabel');
+        }
+        if (cityVal == getLangString('EnterCity')) { 
+			cityWatermarkText = getLangString('EnterCity');
+        }
+        else {
+			cityWatermarkText = getLangString('CityLabel');
+        }
+        zipWatermarkText = getLangString('EnterZip');
+
+        var isCityEmpty = (cityVal == '' || cityVal == cityWatermarkText);
+        var isZipEmpty = (zipVal == '' || zipVal == zipWatermarkText);
+        var isKWEmpty = (kwVal == '' || kwVal == keywordWatermarkText);
+
+        if (!isCityEmpty) {
+            if (isKWEmpty) { //city selected
+                alert(getLangString('KWReqCity'));
+                $enteredKw.trigger("focus");
+                return false;
+            }
+        }
+        else {
+            if (radiusVal == '0') { //statewide
+                if (isKWEmpty && empVal.length == 0) {
+                    alert(getLangString('SatewideReqKeyword'));
+                    $enteredKw.trigger("focus");
+                    return false;
+                }
+            }
+            else {
+                if (isZipEmpty && isKWEmpty && empVal.length == 0) {
+                    alert(getLangString('ZipCodeReq'));
+                    $enteredZip.trigger("focus");
+                    return false;
+                }
+                if (!isZipEmpty && (zipVal.length < 5)) {
+                    alert(getLangString('ZipInvalid'));
+                    $enteredZip.select();
+                    return false;
+                }
+                else if (isZipEmpty && isCityEmpty) {
+                    alert(getLangString('ZipCodeReq'));
+                    $enteredZip.trigger("focus");
+                    return false;
+                }
+                
+            }
+        }
+        if (isKWEmpty) { //keyword empty
+            if (isCityEmpty && (radiusVal != '0')) { //city empty and not statewide
+                alert(getLangString('KWReq'));
+                $enteredKw.trigger("focus");
+                return false;
+            }
+        }
+
+        if ($('#hdnSYS_OPT_V20').length && $('#hdnSYS_OPT_V20').val() == 'True') {
+
+            // Check sessionStorage for any previous preferences
+            var previousOccGroup = sessionStorage.getItem(kwVal);
+
+            if (!previousOccGroup) {
+
+                // Determine if keyword yeilds multiple occ groups
+                var occgroups = '';
+
+                $.ajax({
+                    type: "GET",
+                    url: "Handlers/JobBanks/JobSearchKeyOccGroup.ashx?q=" + kwVal,
+                    data: "",
+                    cache: false,
+                    async: false,
+                    success: function (response) {
+
+                        if (response.length == 0) {
+                            triggerLoadingDIV();
+                        }
+                        else {
+
+                            var arr1 = response.split('\n');
+                            var arr2;
+
+                            var modalMessage = getTranslationLangString("JobSearchKeyOccGroupMessage", "JobSearchQuick");
+                            modalMessage = modalMessage.replace("{0}", kwVal.charAt(0).toUpperCase() + kwVal.slice(1));
+
+                            // Add occupation group options
+                            for (var i = 0; i < arr1.length - 1; i++) {
+                                arr2 = arr1[i].split('|')
+                                occgroups += '<button type="button" class="btn btn-primary btn-block" data-dismiss="modal" onclick="updateOccGroupSubmit(' + "\'" + escape(kwVal) + "\', " + "\'" + arr2[0] + "\'" + ');">' + arr2[1] + '</button>';
+                            }
+
+                            showJobSearchKeyOccGroupModalSubmit(kwVal, occgroups, modalMessage);
+                            trueorfalse = false;
+
+                        }
+
+                    }
+                })
+            }
+            else {
+                // Call job search using previously selected occ group
+                $('#hdJobSearchKeyOccGroup').val(previousOccGroup)
+                triggerLoadingDIV();
+            }
+
+        }
+        else {
+            // Pre version 20.0
+            triggerLoadingDIV();
+        }
+        
+    }
+    else {
+        alert(getLangString('SearchError'));
+        trueorfalse = false;
+    }
+
+    return trueorfalse;
+}
+
+    
+
+//***************************************************************************
+//
+// Rotating News Items
+//
+//***************************************************************************
+// starts news rotation
+function swapNews() {
+    var runMe = false;
+
+    try {
+        if (typeof (runSwapNews) != "undefined") {
+            runMe = runSwapNews;
+        }
+    }
+    catch (err) {
+    }
+
+    if (runMe == true) {
+        if (!document.getElementById) return false;
+        if (!document.getElementById("news")) return false;
+        var links = document.getElementById("news").getElementsByTagName("li");
+        if (links.length > 0) {
+            var t = setInterval(function () { swapLinks(links) }, 5000);
+        }
+    }
+}
+
+// Rotate news articles
+function swapLinks(links) {
+    var counter = 0,
+        i = 0;
+
+    if (links.length <= 1)
+        return;
+
+    for (i = 0; i < links.length; i++) {
+        if (links[i].style.display != 'none' && i != links.length - 1) {
+            counter = ++i;
+            break;
+        }
+        else {
+            counter = 0;
+        }
+    }
+    for (i = 0; i < links.length; i++) {
+        links[i].style.display = 'none';
+    }
+//    if (links.length == counter)   // GH - wasn't looping
+ //       if (links[counter])
+            links[counter].style.display = 'block';
+}
+
+function UpdateImg(ctrl, imgsrc) {
+    var img = document.getElementById(ctrl);
+    img.src = imgsrc;
+}
+
+function createCookieHome(name, value, days) {
+    if (days) {
+        var date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        var expires = '; expires=' + date.toGMTString();
+    }
+    else {
+        expires = '';
+    }
+    document.cookie = name + '=' + value + expires + "; path=" + getCookiePathHome() + "; secure";
+}
+
+function readCookieHome(name) {
+    var nameEQ = name + '=';
+    var ca = document.cookie.split(';');
+
+    for (var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1, c.length);
+        }
+
+        if (c.indexOf(nameEQ) == 0) {
+            return c.substring(nameEQ.length, c.length);
+        }
+    }
+    return null;
+}
+
+function getRoot() {
+    var siteRoot = '';
+    try {
+        if (typeof (rootpath) != "undefined") {
+            siteRoot = rootpath;
+        }
+    }
+    catch (err) {
+    }
+
+    if (siteRoot == '') {
+        siteRoot = $('#MultiSessionURL').text();
+        siteRoot = siteRoot.replace('multisession.asp', '');
+    }
+
+    return siteRoot;
+}
+
+function getLangString(langKey, keyPath) {
+    var langString = '';
+    keyPath = (!keyPath) ? 'HomePage' : keyPath;
+    $.ajax({
+        type: "GET",
+        async: false,
+        url: getRoot() + 'vosnet/Handlers/GSILanguageResourceHandler.ashx',
+        data: 'cmd=GetGlobalResourceValue&rpath=' + keyPath + '&js=true&rkey=' + langKey,
+        success: function (txt) {
+            langString = txt;
+        }
+    });
+    return langString;
+}
+
+function getTranslationLangString(langKey, keyPath) {
+    var langString = '';
+    keyPath = (!keyPath) ? 'HomePage' : keyPath;
+    $.ajax({
+        type: "GET",
+        async: false,
+        cache: false,
+        url: getRoot() + 'vosnet/Handlers/GSILanguageResourceHandler.ashx',
+        data: 'cmd=GetResourceValue&rpath=' + keyPath + '&js=true&rkey=' + langKey,
+        success: function (txt) {
+            langString = txt;
+        }
+    });
+    return langString;
+}
+
+function getAppVarsString(paramKey) {
+    var paramValue = '';
+    $.ajax({
+        type: "GET",
+        async: false,
+        cache: false,
+        url: getRoot() + 'vosnet/Handlers/GSIAppVarsManagerHandler.ashx',
+        data: 'cmd=GetAppValByKey&RKEYNAME=' + paramKey,
+        success: function (txt) {
+            paramValue = txt;
+        }
+    });
+    return paramValue;
+}
+
+function confirmLogOff() {
+    if (confirm(getLangString('ConfirmLogOffMessage', 'Resource'))) {
+        window.location.href = getRoot() + 'vosnet/logoff.aspx?clearsession=true';
+    }
+}
+
+// JQUERY IMAGE ROTATOR CODE
+
+function theRotator() {
+    //Set the opacity of all images to 0
+    $('div#rotator ul li').css({ opacity: 0.0 });
+
+    //Get the first image and display it (gets set to full opacity)
+    $('div#rotator ul li:first').css({ opacity: 1.0 });
+
+    //Call the rotator function to run the slideshow, 6000 = change to next image after 6 seconds
+    setInterval('rotate()', 5000);
+
+}
+
+function rotate() {
+    //Get the first image
+    var current = ($('div#rotator ul li.show') ? $('div#rotator ul li.show') : $('div#rotator ul li:first'));
+
+    //Get next image, when it reaches the end, rotate it back to the first image
+    var next = ((current.next().length) ? ((current.next().hasClass('show')) ? $('div#rotator ul li:first') : current.next()) : $('div#rotator ul li:first'));
+
+    //Set the fade in effect for the next image, the show class has higher z-index
+    next.css({ opacity: 0.0 })
+	.addClass('show')
+	.animate({ opacity: 1.0 }, 2000);
+
+    //Hide the current image
+    current.animate({ opacity: 0.0 }, 2000)
+	.removeClass('show');
+
+};
+
+function handleIframe(redirURL) {
+    var inIframe = false;
+    try {
+        if (window.parent && window.parent.frames && window.parent.frames.length > 0) {
+            inIframe = true;
+        }
+    }
+    catch (err) {
+    }
+
+    if (!redirURL) {
+        $('<input>').attr({
+            type: 'hidden',
+            id: 'hdnHomeInIframe',
+            name: 'hdnHomeInIframe',
+            value: inIframe
+        }).appendTo('form');
+    }
+    else if (inIframe) {
+        window.parent.location = redirURL;
+    }
+    else {
+        window.location = redirURL;
+    }
+}
+
+function getCookiePathHome() {
+    var cookiePath = '/';
+
+    if ($('#CookiePath').length > 0 && $('#CookiePath').text() != '') {
+        cookiePath = $('#CookiePath').text();
+    }
+
+    return cookiePath;
+}
+
+var trackButtonID = ''; //this is called from the homepage sign in fields
+function setDefaultButton(buttonID) {
+    //alert('buttonID: ' + buttonID + ' trackButtonID: ' + trackButtonID);
+    //if (buttonID != trackButtonID) {
+    //    trackButtonID = buttonID;
+    //    $('form').removeAttr('onkeypress');
+    //    $('form').on("keypress", function (e) {
+    //        return WebForm_FireDefaultButton(e, buttonID);
+    //    });
+    //}
+}
+
+//***************************************************************************
+//
+// Menu Header Accordion Functions
+//
+//***************************************************************************
+//These can be overriden in the header area of the master page after loading this file
+var signinMenuID = 'menu_signin',
+    searchMenuID = 'search';
+
+// Add onmouseover event to menu header links
+function addMenuEventHandlerHome() {
+    var $menuModules = $('#menu div.module:not(#' + signinMenuID + '):not(#' + searchMenuID + ')');
+
+    $menuModules.find('ul').hide();
+
+    for (var i = 0; i < $menuModules.length; i++) {
+        var $menuModule = $($menuModules[i]).find('a:first');
+        $menuModule.mouseover(function () {
+            $menuModules.find('ul').hide();
+            var $parent = $($(this).parent());
+            if ($parent.find('ul').length == 0)
+                $parent = $parent.parent();
+            $parent.find('ul').show();
+        });
+    }
+}
+
+//***************************************************************************
+//
+// Site Search Function with Spanish - Makes the loading div section a functional call.
+//
+//***************************************************************************
+
+
+function triggerLoadingDIV() {
+          if ($('#opgLanguage').val() == 'S') {
+                        var $loadingDiv = $('.ajaxLoadingDIV_s');
+                  } else {
+                        var $loadingDiv = $('.ajaxLoadingDIV');
+                                  }
+
+        if ($loadingDiv.length > 0) {
+            $loadingDiv.slideDown('fast');
+            //Position the loading div on the center of the screen
+            $loadingDiv.css("top", (($(window).height() - $loadingDiv.outerHeight()) / 3) + $(window).scrollTop() + "px");
+            $loadingDiv.css("left", (($(window).width() - $loadingDiv.outerWidth()) / 2) + $(window).scrollLeft() + "px");
+        }
+    
+        return true;
+}
+
+$(document).ready(function () {  
+    $('#univsearchtxtkeyword,#univsearchlocation,#txtKeyword,#txtCity').on("keypress keydown", function (e) {
+        if (e.which == 13) { // search on ENTER keypress for splash pages
+            $('#univsearchbtn,#ctl00_cmdSearchImg').trigger("click");
+        }
+    });
+    $('#txtPassword,#txtPassword2').on("keydown", function (e) {
+        if (e.which == 13) { // submit on ENTER keypress for password field
+            if ($('a#ctl00_cmdLogin').length) {
+                $('a#ctl00_cmdLogin').focus().trigger("click");
+                __doPostBack('ctl00$cmdLogin', '');
+            }
+            if ($('a#ctl00_cmdLoginButt').length) {
+                $('a#ctl00_cmdLoginButt').focus().trigger("click");
+                __doPostBack('ctl00$cmdLoginButt', '');
+            }
+        }
+    });
+
+    // alert-dismiss code
+    var alertdismiss, alertheight;
+    alertdismiss = sessionStorage.getItem("alertdis"); // alert session storage
+    if (alertdismiss != "true") {
+        $("#review_encl").removeClass("dismissed");
+    }
+    $("#alertdismiss").on("click", function () {
+        alertheight = $("#review_encl").outerHeight();
+        sessionStorage.setItem("alertdis", "true");
+        $("#review_encl").stop().animate({
+            height: "0px",
+        }, 100, function () {
+            $("#review_encl").hide();
+        });
+    });
+    $("#gui_nav_alert,span#ctl00_lblAlertMenuToggle").on("click", function () {
+        sessionStorage.setItem("alertdis", "false");
+        $("#review_encl").stop().animate({
+            height: alertheight + 'px',
+        }, 100, function () {
+            $("#review_encl").removeClass("dismissed");
+            $("#review_encl").show();
+        });
+    });
+
+});
+function homeUnivSearch(defaultGeo, lang, zipOrCity)
+{
+  
+    var mKeyword = $('#univsearchtxtkeyword');
+    var mLocation = $('#univsearchlocation');
+    var mJobNumber = $('#univsearchjobnumber');
+    var mDateRange = $('#univsearchdate');
+    var mRadius = $('#univsearchradius');
+    var mDate = '';
+    var mCustomSearch = $('.univcustomsearch').first().val();
+    var mGreenSearch = $('#ctl00_hfGreen');
+    var mPaymentType = $('.univpaymenttype').first().val();
+    var mJobType = $('.univJobType').first().val();
+    var mInternshipJob = $('#chkInternships').prop('checked');
+    var mApprenticeJob = $('#chkApprenticeship').prop('checked');
+    var mOJT = $('#chkOTJTraining').prop('checked');
+    var mrad = 50;
+    var mloc = mLocation.val();
+    var isZip = false;
+    var isJobNumber = false;
+    var strRedirectURL, begPath, endPath, passKeyword = '';
+    var studentPage = $('[id$="stdntjobsearch"]').length > 0;
+    var mNdx = 0;
+    var mWhereTo = 'HOMESEARCH';
+    var mBranch = $('#branch');
+    var mPersonnel = $('#personnel');
+    var mMosCode = $('#moscode');
+    var mStrVet = '';
+    var plang = '&plang=' + lang;
+    var mSiteAccessed = $('#siteaccessed');
+    var mSEJobType = $('input[name=seJobType]:checked').val();
+    var clientsrch = false;
+    passKeyword = encodeURIComponent(mKeyword.val());
+    if (passKeyword == 'undefined' || passKeyword == 'Keyword') { passKeyword = ''; }
+    if (mGreenSearch.val() == 'true') { mWhereTo = 'HOMESEARCHGREEN' }
+    strRedirectURL = 'vosnet/guest.aspx?guesttype=IND'
+    if (studentPage) { strRedirectURL = strRedirectURL + '&subguesttype=STUDENTVOS' }
+    
+    if ((typeof mKeyword.val() === 'undefined'?true : false)==true)
+    {
+    }
+    else
+    {
+        if (mKeyword.val() != '')
+        {  // check for MOC search
+            if (mKeyword.val().startsWith("Enter") || mKeyword.val().startsWith("Entre"))
+            {
+                if (mMosCode != null && mBranch != null && mPersonnel != null)
+                {
+                    if (mMosCode.val() != null)
+                    {
+                        if ((mMosCode.val() !== '0' && mMosCode.val().length > 0) && (mBranch.val() !== '0' && mBranch.val().length > 0) && (mPersonnel.val() !== '0' && mPersonnel.val().length > 0))
+                        {
+                            mWhereTo = 'SEARCHMOS';
+                            mStrVet = '&branch=' + mBranch.val() + '&moc=' + mMosCode.val() + '&personnel=' + mPersonnel.val();
+                        }
+                        else
+                        {
+                            alert('Please choose a Branch of Service, Personnel Category and the MOC code to proceed.');
+                            return false;
+                        }
+                    }
+                }
+                passKeyword = ''; // set to empty to search all jobs
+            }
+        }
+    }
+    if (mJobNumber.val()) {
+            if (mJobNumber.val().length > 0 & mJobNumber.val() != 'Job Order Number') {
+            isJobNumber = true;
+        }
+    }
+    //Ireland
+// SRead 12/18/2017 Changed regex to support BT12 7PU as a zip code
+    if (mloc.match(/\d+/g) != null && mloc.length == 5) {
+        isZip = true;
+        mloc = mloc.substring(0, 5);
+    }
+    //Everyone else but ehy need 5 above
+    if ($.isNumeric(mloc)) {  // check if location value is a number
+        isZip = true;
+        mloc = mloc.substring(0, 5);
+    }
+
+    if ((mloc.indexOf('Zip') > -1 || mloc.indexOf('Postal') > -1) && !isJobNumber) {
+        mloc = "";
+        //alert('Zip Code or city' + mloc);
+        //return false;
+    }
+
+
+    if (mRadius.length && !isJobNumber) {  // check if radius input exists //added special exclusion for ventura.
+        mrad = mRadius.val();
+        if (mrad.length == 10) { // use clientID
+            mloc = mrad;
+            mrad = "0";
+            clientsrch = true;
+        }
+        if (passKeyword == '' && defaultGeo.indexOf('78') != 0 && defaultGeo.indexOf('66') != 0) {
+            if (mrad == "0" && clientsrch == false) {
+                if (lang == 'E') {
+                    alert('Please select a Keyword or an area less than statewide.');
+                }
+                if (lang == 'S') {
+                    alert('Seleccione una palabra clave o un área menor que en todo el estado.');
+                }
+                return false;
+            } else {
+                if (mloc == "") {
+                    if (lang == 'E') {
+                        alert('Please select a Keyword and a ' + zipOrCity +'.');
+                    }
+                    if (lang == 'S') {
+                        alert('Seleccione una palabra clave y una ' + zipOrCity +'.');
+                    }
+                    return false;
+                }
+            }
+            if (!isZip && mloc == "") {
+                if (lang == 'E') {
+                    alert('Please select a Keyword or an area.');
+                }
+                if (lang == 'S') {
+                    alert('Por favor, seleccione una palabra clave o un área.');
+                }
+                return false;
+            }
+        } else {
+            if (mrad != "0" && mloc == "") {
+                if (lang == 'E') {
+                    alert('Please choose a ' + zipOrCity +' or select a statewide search.');
+                }
+                if (lang == 'S') {
+                    alert('Por favor, seleccione una ' + zipOrCity +' o realice una búsqueda a nivel estatal.');
+                }
+                return false;
+            }
+        }
+        if (mrad != "0" && mloc == "") {
+            if (lang == 'E') {
+                alert('Please choose a ' + zipOrCity +' or select a statewide search.');
+            }
+            if (lang == 'S') {
+                alert('Por favor, seleccione una ' + zipOrCity +' o realice una búsqueda a nivel estatal.');
+            }
+            return false;
+        }
+    }
+    if (mDateRange.length) {
+        mDate = mDateRange.val();
+    }
+    
+    if (isJobNumber) {
+        strRedirectURL = strRedirectURL + "&whereto=" + mWhereTo + "&search=geo&geo=" + mloc + "&radius=" + mrad + "&keyword=" + passKeyword + "&txtIdnum=" + mJobNumber.val() + mStrVet + plang;
+        //alert(strRedirectURL);
+    } else {
+        if (isZip) {  //call search with zip
+            if (mrad == "0" && clientsrch == false) {
+                alert('When entering a zip code or city, you must select a radius other than statewide. Please select a radius or delete your zip code/city entry.');
+                return false;
+            }
+            if (mrad == "0" && clientsrch == true) {
+                alert('When entering a zip code or city, you must select a radius other than county-wide. Please select a radius or delete your zip code/city entry.');
+                return false;
+        }
+            strRedirectURL = strRedirectURL + "&whereto=" + mWhereTo + "&search=zip&zip=" + mLocation.val() + "&radius=" + mrad + "&daterange=" + mDate + "&keyword=" + passKeyword + mStrVet + plang;
+
+        } else if ($.isNumeric(mloc) && mloc.length == 10) { // clientID search
+            strRedirectURL = strRedirectURL + "&whereto=" + mWhereTo + "&search=geo&cboJobtype=1,2,3,4,6,7,8&geo=" + mloc + "&radius=" + mrad + "&daterange=" + mDate + "&keyword=" + passKeyword + mStrVet + plang;
+        } else {
+            if (mloc.length > 1 && (mloc != 'Zip Code or City' && mloc != 'Código Postal o Ciudad' && mloc != 'Postal oswa Vil la' && mloc != 'ZIP')) {  // call search with city
+                mloc = encodeURIComponent(mLocation.val());
+                strRedirectURL = strRedirectURL + "&whereto=" + mWhereTo + "&search=city&city=" + mloc + "&radius=" + mrad + "&daterange=" + mDate + "&keyword=" + passKeyword + mStrVet + plang;
+
+            } else {  // call search with default geo if no city or zip given
+                mloc = defaultGeo;
+                strRedirectURL = strRedirectURL + "&whereto=" + mWhereTo + "&search=geo&geo=" + mloc + "&radius=" + mrad + "&daterange=" + mDate + "&keyword=" + passKeyword + mStrVet + plang;
+            }
+        
+        }
+    }
+    //#362223
+    
+    strRedirectURL = strRedirectURL + '&customsearch=' + mCustomSearch;
+    if (mCustomSearch == 'internshipjobtype')
+    {
+        
+
+        strRedirectURL = strRedirectURL + '&paymenttype=' + mPaymentType;
+    }
+
+    //#362653
+    if (mCustomSearch == 'silveredition')
+    {
+        if (typeof (mSEJobType) != "undefined")
+        {
+            //************VOLUNTEER
+            if (mSEJobType == 'Volunteer')
+            {
+
+                mJobType = "5";
+
+            }
+
+            //************PAID
+            if (mSEJobType == 'PaidJobs')
+            {
+                mJobType = "1,2,3,4,6,7,8";
+                mPaymentType = '1'
+                strRedirectURL = strRedirectURL + '&paymenttype=' + mPaymentType;
+
+            }
+
+            //************OLDER WORKER FRIENDLY
+            //Handled below
+        }
+    }
+
+    //362065
+    if (typeof (mJobType) != "undefined")
+    {
+        //**************Internship
+        if (mInternshipJob)
+        {
+            if (mJobType.length > 0)
+            {
+            
+                mJobType = mJobType + ",6";
+            }
+            else
+            {
+                mJobType = "6";
+            }
+
+        }
+        
+    
+       //************Apprenticeship
+        if (mApprenticeJob)
+        {
+            if (mJobType.length > 0)
+            {
+
+                mJobType = mJobType + ",7";
+            }
+            else
+            {
+                mJobType = "7";
+            }
+
+        }
+
+        //************OJT
+        if (mOJT)
+        {
+            if (mJobType.length > 0)
+            {
+
+                mJobType = mJobType + ",8";
+            }
+            else
+            {
+                mJobType = "8";
+            }
+
+        }
+
+        
+
+        strRedirectURL = strRedirectURL + '&jobtype=' + mJobType;
+        
+    }
+
+    if (typeof(mJobType) != "undefined")
+    {
+        if (mJobType == "" || mJobType == null)
+        {
+            alert("You must select 1 or more of the job types above for your search.");
+            return false;
+        }
+    }
+
+    if (typeof (mSEJobType) != "undefined")
+    {
+        if (mSEJobType == 'OlderFriendly')
+        {
+            strRedirectURL = strRedirectURL + "&ff_empcharacteristics=3" 
+        }
+    }
+    
+    mNdx = document.location.href.indexOf('vosnet');
+    if (mNdx > 0) {
+        begPath = document.location.href.substring(0, mNdx);
+    }
+    endPath = begPath + strRedirectURL;
+    //alert(endPath);
+
+    if ($('#hdnSYS_OPT_V20').length && $('#hdnSYS_OPT_V20').val() == 'True') {
+        
+        // Check sessionStorage for any previous preferences
+        var previousOccGroup = sessionStorage.getItem(mKeyword.val().toLowerCase());
+
+        if (!previousOccGroup)
+        {
+
+            // Determine if keyword yeilds multiple occ groups
+            var occgroups = '';
+
+            $.ajax({
+                type: "GET",
+                url: "Handlers/JobBanks/JobSearchKeyOccGroup.ashx?q=" + mKeyword.val(),
+                data: "",
+                cache: false,
+                success: function (response) {
+
+                    if (response.length == 0) {
+                        document.location = encodeURI(endPath);
+                        triggerLoadingDIV();
+                    }
+                    else {
+
+                        var arr1 = response.split('\n');
+                        var arr2;
+
+                        var modalMessage = getTranslationLangString("JobSearchKeyOccGroupMessage", "JobSearchQuick");
+                        modalMessage = modalMessage.replace("{0}", mKeyword.val().charAt(0).toUpperCase() + mKeyword.val().slice(1));
+
+                        // Add occupation group options
+                        for (var i = 0; i < arr1.length - 1; i++) {
+                            arr2 = arr1[i].split('|')
+                            occgroups += '<button type="button" class="btn btn-primary btn-block" data-dismiss="modal" onclick="appendOccGroupRedirect(' + "\'" + escape(mKeyword.val()) + "\', " + "\'" + arr2[0] + "\', \'" + endPath + "\'" + ');">' + arr2[1] + '</button>';
+                        }
+
+                        showJobSearchKeyOccGroupModal(mKeyword.val(), occgroups, modalMessage, endPath);
+
+                    }
+
+                }
+            })
+        }
+        else {
+            // Call job search using previously selected occ group
+            endPath = endPath + '&occgroup=' + previousOccGroup;
+            document.location = encodeURI(endPath);
+            triggerLoadingDIV();
+        }
+
+    }
+    else
+    {
+        // Pre version 20.0
+        document.location = encodeURI(endPath);
+        triggerLoadingDIV();
+    }
+
+    return true;
+}
+
+//362223
+function getPaymentType(value)
+{
+    var textPay = $('.univpaymenttype');
+    if (value!=null)
+    {
+        if (value == '""')
+        {
+            textPay.val('0');
+        }
+        else
+        {
+            textPay.val(value);
+        }
+        
+    }
+    return true;
+}
+
+//362065
+function setJobType(value, checked)
+{
+    if (checked = 'true')
+    {
+        document.getElementById("univJobType").value = value;
+    }
+    else
+    {
+        document.getElementById("univJobType").value = '""'
+    }
+
+    return true;
+}
+
+function isCapsLockOn(e) {
+    var keyCode = e.keyCode ? e.keyCode : e.which;
+    var shiftKey = e.shiftKey ? e.shiftKey : ((keyCode == 16) ? true : false);
+    return (((keyCode >= 65 && keyCode <= 90) && !shiftKey) || ((keyCode >= 97 && keyCode <= 122) && shiftKey))
+}
+
+function ShowCapsLockWarning(index, element) {
+    var htmlString = "<div style='display:block;padding:10px;border:solid 1px #000;color:blue;font-weight:bold;background:#fff;z-index:1000;' id='capslock'> Caps Lock is On </div>"
+    var newDiv = $('<div/>').prop('class', 'caps-lock-alert-div');
+    $(newDiv).html(htmlString);
+    $(newDiv).insertAfter(element);
+}
+
+function ClearCapsLockWarning(element) {
+    $(element).parent().find('.caps-lock-alert-div').each(function (i, e) {
+        $(e).html('');
+    });
+}
+
+//put accessibility feature in session storage
+function storeAccessibilityFeature(feature, value) {
+    var newFeature = feature;
+    var newValue = value;
+
+}
+
+function showJobSearchKeyOccGroupModal(key, occgroups, msg, url) {
+
+    if (occgroups.length > 0) {
+        var divJobSearchKeyOcGroup;
+        divJobSearchKeyOcGroup = '<div class="modal fade" id="modalJobSearchKeyOccGroup" tabindex="-1" role="dialog"' +
+            ' aria-labelledby="modalJobSearchKeyOccGroup" aria-hidden="true" data-keyboard="false" data-backdrop="static">' +
+            '<div class="modal-dialog" role="document">' +
+                '<div class="modal-content">' +
+                    '<div class="modal-header">' +
+                        '<h4><div id="spnJobSearchKeyOccGroupStart"></div></h4>' +
+                    '</div>' +
+                    '<div class="modal-body">' +
+                        '<span id="spnJobSearchKeyOccGroupBtns"></span>' +
+                    '</div>' +
+                    '<div class="modal-footer justify-content-between">' +
+                    '   <button type="button" class="btn btn-secondary client-color mr-auto" data-dismiss="modal" onclick="appendOccGroupRedirect(' + "\'" + escape(key) + "\', null, " + "\'" + url + "\'" + ');">' + getTranslationLangString("JobSearchKeyOccGroupShowAllResults", "JobSearchQuick") + '</button>' +
+                    '   <button type="button" class="btn btn-secondary client-color" data-dismiss="modal">' + getTranslationLangString("JobSearchKeyOccGroupCancel", "JobSearchQuick") + '</button>' +
+                    '</div>' +
+                '</div>' +
+            '</div>' +
+        '</div>';
+        $('body').append(divJobSearchKeyOcGroup);
+        $('#spnJobSearchKeyOccGroupStart').html(msg)
+        $('#spnJobSearchKeyOccGroupBtns').html(occgroups)
+        $('#modalJobSearchKeyOccGroup').modal('show');
+    }
+   
+}
+
+function showJobSearchKeyOccGroupModalSubmit(key, occgroups, msg) {
+
+    if (occgroups.length > 0) {
+        var divJobSearchKeyOcGroup;
+        divJobSearchKeyOcGroup = '<div class="modal fade" id="modalJobSearchKeyOccGroup" tabindex="-1" role="dialog"' +
+            ' aria-labelledby="modalJobSearchKeyOccGroup" aria-hidden="true" data-keyboard="false" data-backdrop="static">' +
+            '<div class="modal-dialog" role="document">' +
+                '<div class="modal-content">' +
+                    '<div class="modal-header">' +
+                        '<h4><div id="spnJobSearchKeyOccGroupStart"></div></h4>' +
+                    '</div>' +
+                    '<div class="modal-body">' +
+                        '<span id="spnJobSearchKeyOccGroupBtns"></span>' +
+                    '</div>' +
+                    '<div class="modal-footer justify-content-between">' +
+                    '   <button type="button" class="btn btn-secondary client-color mr-auto" data-dismiss="modal" onclick="updateOccGroupSubmit(' + "\'" + escape(key) + "\', null " + ');">' + getTranslationLangString("JobSearchKeyOccGroupShowAllResults", "JobSearchQuick") + '</button>' +
+                    '   <button type="button" class="btn btn-secondary client-color" data-dismiss="modal">' + getTranslationLangString("JobSearchKeyOccGroupCancel", "JobSearchQuick") + '</button>' +
+                    '</div>' +
+                '</div>' +
+            '</div>' +
+        '</div>';
+        $('body').append(divJobSearchKeyOcGroup);
+        $('#spnJobSearchKeyOccGroupStart').html(msg)
+        $('#spnJobSearchKeyOccGroupBtns').html(occgroups)
+        $('#modalJobSearchKeyOccGroup').modal('show');
+    }
+
+}
+
+function appendOccGroupRedirect(key, occgroup, url) {
+
+    if (!occgroup || occgroup != "") {
+        url += "&occgroup=" + occgroup;
+        sessionStorage.setItem(decodeURI(key).toLowerCase(), occgroup);
+    }
+
+    document.location = encodeURI(url);
+    triggerLoadingDIV();
+
+    return true;
+}
+
+function updateOccGroupSubmit(key, occgroup) {
+
+    if (!occgroup || occgroup != "") {
+        $('#hdJobSearchKeyOccGroup').val(occgroup)
+        sessionStorage.setItem(decodeURI(key).toLowerCase(), occgroup);
+    }
+    $("#btnJobSearchKeyOccGroup").click();
+    triggerLoadingDIV();
+    return true;
+}

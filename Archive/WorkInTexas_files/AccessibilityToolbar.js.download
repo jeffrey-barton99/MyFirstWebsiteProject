@@ -1,0 +1,482 @@
+﻿/**********************ACCESSIBILITY TOOLBAR**********************
+*   PLA 10/19/2018
+*   JS for setting accessiblity preferences
+    469916 JC  12/26/2018 - Zoom page save for page to page.
+******************************************************************/
+
+/* Find the settings in the cookie, if it exists*/
+//$(document).ready(function () {
+
+    //$('body').addClass('ATBZoom100');
+    //$('#AppFontSize').val("ATBZoom100");
+    //sessionStorage.setItem("fontSize", "ATBZoom100");
+
+
+
+//    // Check (onLoad) if the cookie is there and set the class if it is
+//    // Contrast
+//    //if ($.cookie('ATBbrightHighContrast') == "yes") {
+//    //    $("body").addClass("ATBbrightHighContrast");
+//    //}
+//    //else if ($.cookie('ATBdarkHighContrast') == "yes") {
+//    //    $("body").addClass("ATBdarkHighContrast");
+//    //}
+
+//    //Monochrome
+//    //if ($.cookie('ATBmonochrome') == "yes") {
+//    //    $("body").addClass("ATBmonochrome");
+//    //}
+
+//    //Invert colors
+//    //if ($.cookie('ATBinvertColors') == "yes") {
+//    //    $("body").addClass("ATBinvertColors");
+//    //}
+
+    //    //
+
+//})
+
+/********************FONTS**************************************/
+var defaultFontSize //= $("body").css("font-size");
+var originalFontNumber
+var newFontNumber
+var newDefaultFontSize
+
+function incFont() {
+    if ($('body').hasClass('ATBZoom75') == true) {
+        $('body').removeClass('ATBZoom75');
+        $('body').addClass('ATBZoom100');
+        $('#AppFontSize').val("ATBZoom100");
+        sessionStorage.fontsize = 'ATBZoom100';
+    }
+    else if ($('body').hasClass('ATBZoom100') == true) {
+        $('body').removeClass('ATBZoom100');
+        $('body').addClass('ATBZoom125');
+        $('#AppFontSize').val("ATBZoom125");
+        sessionStorage.fontsize = 'ATBZoom125';
+    }
+    else if ($('body').hasClass('ATBZoom125') == true) {
+        $('body').removeClass('ATBZoom125');
+        $('body').addClass('ATBZoom150');
+        $('#AppFontSize').val("ATBZoom150");
+        sessionStorage.fontsize = 'ATBZoom150';
+    }
+    else if ($('body').hasClass('ATBZoom150') == true) {
+        $('body').removeClass('ATBZoom150');
+        $('body').addClass('ATBZoom175');
+        $('#AppFontSize').val("ATBZoom175");
+        sessionStorage.fontsize = 'ATBZoom175';
+    }
+    else if ($('body').hasClass('ATBZoom175') == true) {
+        $('body').removeClass('ATBZoom175');
+        $('body').addClass('ATBZoom200');
+        $('#AppFontSize').val("ATBZoom200");
+        sessionStorage.fontsize = 'ATBZoom200';
+    }
+    else if ($('body').hasClass('ATBZoom200') == true) {
+        $('body').removeClass('ATBZoom200');
+        $('body').addClass('ATBZoom250');
+        $('#AppFontSize').val("ATBZoom250");
+        sessionStorage.fontsize = 'ATBZoom250';
+    }
+
+    return false;
+}
+function decFont() {
+    if ($('body').hasClass('ATBZoom250') == true) {
+        $('body').removeClass('ATBZoom250');
+        $('body').addClass('ATBZoom200');
+        $('#AppFontSize').val("ATBZoom200");
+        sessionStorage.fontsize = 'ATBZoom200';
+    }
+    else if ($('body').hasClass('ATBZoom200') == true) {
+        $('body').removeClass('ATBZoom200');
+        $('body').addClass('ATBZoom175');
+        $('#AppFontSize').val("ATBZoom175");
+        sessionStorage.fontsize = 'ATBZoom175';
+    }
+    else if ($('body').hasClass('ATBZoom175') == true) {
+        $('body').removeClass('ATBZoom175');
+        $('body').addClass('ATBZoom150');
+        $('#AppFontSize').val("ATBZoom150");
+        sessionStorage.fontsize = 'ATBZoom150';
+    }
+    else if ($('body').hasClass('ATBZoom150') == true) {
+        $('body').removeClass('ATBZoom150');
+        $('body').addClass('ATBZoom125');
+        $('#AppFontSize').val("ATBZoom125");
+        sessionStorage.fontsize = 'ATBZoom125';
+    }
+    else if ($('body').hasClass('ATBZoom125') == true) {
+        $('body').removeClass('ATBZoom125');
+        $('body').addClass('ATBZoom100');
+        $('#AppFontSize').val("ATBZoom100");
+        sessionStorage.fontsize = 'ATBZoom100';
+    }
+    else if ($('body').hasClass('ATBZoom100') == true) {
+        $('body').removeClass('ATBZoom100');
+        $('body').addClass('ATBZoom75');
+        $('#AppFontSize').val("ATBZoom75");
+        sessionStorage.fontsize = 'ATBZoom75';
+    }
+
+    return false;
+}
+
+function readableFont() {
+    if ($('body').hasClass('ATBsansFont') == true) {
+        $('body').removeClass('ATBsansFont');
+        sessionStorage.setItem('readablefont', 'false');
+    }
+    else {
+        $('body').addClass('ATBsansFont');
+        sessionStorage.setItem('readablefont', 'true');
+    }
+    return false;
+}
+
+function leftJustify() {
+    if ($('body').hasClass('ATBTextLeft') == true) {
+        $('body').removeClass('ATBTextLeft');
+        $('#fontPreview').removeClass('ATBTextLeft');
+        sessionStorage.setItem('leftjustify', 'False');
+    }
+    else {
+        $('body').addClass('ATBTextLeft');
+        $('#fontPreview').addClass('ATBTextLeft');
+        sessionStorage.setItem('leftjustify', 'true');
+    }
+    return false;
+}
+
+function resetFont() {
+    
+    $('body').removeClass('ATBsansFont');
+    $('body').css("font-size", "1em");
+    $('btnReset').checked = false;
+}
+
+
+/*********************************CONTRAST/COLOR*******************************/
+function resetContrast() {
+    $("body").removeClass("ATBbrightHighContrast");
+    $("body").removeClass("ATBdarkHighContrast");
+    $("body").removeClass("ATBmonochrome");
+    $("body").removeClass("ATByellowOnBlack");
+    $('label').removeClass("ATByellowOnBlack");
+    $('label').removeClass("ATBinvertColors");
+    $("#ctl00_Main_content_chkHighContrast").prop("checked", false);
+    $("#ctl00_Main_content_chkContrastMono").prop("checked", false);
+    $("#ctl00_Main_content_chkContrastYonB").prop("checked", false);
+    $("#ctl00_Main_content_chkContrastInvert").prop("checked", false);
+}
+
+
+function contrastHighDark() {
+    
+    var hasHighContrast = $('body').hasClass("ATBdarkHighContrast")
+   
+    if (hasHighContrast == true) {
+        $('body').removeClass('ATBdarkHighContrast');
+        sessionStorage.setItem('highcontrast', 'false');
+    }
+    else {
+        $('body').addClass('ATBdarkHighContrast');
+        sessionStorage.setItem('highcontrast', 'true');
+    }
+    return false;
+}
+
+
+
+function contrastMonochrome() {
+    var hasMonochrome = $('body').hasClass("ATBmonochrome")
+    if (hasMonochrome == true) {
+        $('body').removeClass('ATBmonochrome');
+        sessionStorage.setItem('monochrome', 'false');
+    }
+    else {
+        $('body').addClass('ATBmonochrome');
+        sessionStorage.setItem('monochrome', 'true');
+    }
+    return false;
+}
+
+function contrastBW() {
+    var hasBlackAndWhite = $('body').hasClass("ATBblackAndWhite");
+    if (hasBlackAndWhite == true) {
+        $('body').removeClass('ATBblackAndWhite');
+        sessionStorage.setItem('blackandwhite', 'false');
+    }
+    else {
+        $('body').addClass('ATBblackAndWhite');
+        sessionStorage.setItem('blackandwhite', 'true');
+    }
+    return false;
+    
+}
+
+function contrastYonB() {
+    var hasYellowOnBlack = $('body').hasClass("ATByellowOnBlack");
+    if (hasYellowOnBlack == true) {
+        $('body').removeClass('ATByellowOnBlack');
+        sessionStorage.setItem('yellowonblack', 'false');
+    }
+    else
+    {
+        $('body').addClass('ATByellowOnBlack');
+        sessionStorage.setItem('yellowonblack', 'true');
+    }
+    return false;
+}
+
+function invertColors() {
+    var hasInvertedColors = $('body').hasClass("ATBinvertColors");
+    if (hasInvertedColors == true) {
+        $('body').removeClass('ATBinvertColors');
+        sessionStorage.setItem('invertedcolors', 'false');
+    }
+    else {
+        $('body').addClass('ATBinvertColors');
+        sessionStorage.setItem('invertedcolors', 'true');
+    }
+    return false;
+}
+
+
+
+/***************************************CURSOR********************************/
+
+function cursorLarge() {
+    //cursorDefault();
+    var hasLargeCursor = $('body').hasClass("ATBLargeCursor");
+    if (hasLargeCursor == true) {
+        $('body').removeClass('ATBLargeCursor');
+        $('#ctl00_Main_content_lwhitecursor').checked = false;
+    }
+    else
+    {
+        $('body').addClass('ATBLargeCursor');
+    }
+    
+   
+}
+
+function cursorWhite() {
+    var hasLargeCursor = $('body').hasClass("ATBLargeCursor");
+    var hasLargeBlackCursor = $('body').hasClass("ATBLargeBlackCursor");
+    if (hasLargeBlackCursor == true) {
+        $('body').removeClass('ATBLargeBlackCursor');
+        $('#ctl00_Main_content_lblackcursor').checked = false;
+    }
+    if (hasLargeCursor == true) {
+        $('body').removeClass('ATBLargeCursor');
+        $('#ctl00_Main_content_lwhitecursor').checked = false;
+    }
+    else {
+        $('body').addClass('ATBLargeCursor');
+    }
+    return false;
+   
+}
+
+function cursorBlack() {
+    var hasLargeCursor = $('body').hasClass("ATBLargeCursor");
+    var hasLargeBlackCursor = $('body').hasClass("ATBLargeBlackCursor");
+    if (hasLargeCursor == true) {
+        $('body').removeClass('ATBLargeCursor');
+        $('#ctl00_Main_content_lwhitecursor').checked = false;
+    }
+    if (hasLargeBlackCursor == true) {
+        $('body').removeClass('ATBLargeBlackCursor');
+        $('#ctl00_Main_content_lblackcursor').checked = false;
+    }
+    else {
+        $('body').addClass('ATBLargeBlackCursor');
+    }
+    return false;
+}
+
+function cursorDefault() {
+    $('body').removeClass('ATBLargeCursor');
+    $('body').removeClass('ATBLargeBlackCursor');
+    $("#ctl00_Main_content_lblackcursor").prop("checked", false);
+    $("#ctl00_Main_content_lwhitecursor").prop("checked", false);
+    return false;
+}
+
+/*********************************HIGHLIGHTS*********************************/
+
+function highlightLinks() {
+    $('body').find('a').each(function () {
+        if ($(this).hasClass('ATBhighlight')==true) {
+            $(this).removeClass('ATBhighlight');
+            sessionStorage.setItem('highlightlinks', 'False');
+        }
+        else
+        {
+            $(this).addClass('ATBhighlight');
+            sessionStorage.setItem('highlightlinks', 'True');
+        }
+    });
+    
+    return false;
+}
+
+function highlightHeadings() {
+    $(':header').each(function () {
+        if ($(this).hasClass('ATBhighlight') == true) {
+            $(this).removeClass('ATBhighlight');
+            sessionStorage.setItem('highlightlinks', 'False');
+        }
+        else {
+            $(this).addClass('ATBhighlight');
+            sessionStorage.setItem('highlightlinks', 'True');
+        }
+    });
+
+    // Can be added to highlight fieldset Legends once we are able to get the legend hidden headers throughout the system
+    //$('legend').each(function () {
+    //    if ($(this).hasClass('ATBhighlight') == true) {
+    //        $(this).removeClass('ATBhighlight');
+    //    }
+    //    else {
+    //        $(this).addClass('ATBhighlight');
+    //    }
+    //});
+
+    return false;
+}
+
+
+function clearSession() {
+    //clear all settings
+    $('input[type=checkbox]').each(function()
+    {
+        this.checked=false;
+    })
+    $('input[type=radio]').each(function () {
+        this.checked = false;
+    })
+    sessionStorage.removeItem('highcontrast');
+    sessionStorage.removeItem('blackandwhite');
+    sessionStorage.removeItem('invertedcolors');
+    sessionStorage.removeItem('monochrome');
+    sessionStorage.removeItem('yellowonblack');
+    sessionStorage.removeItem('lblackcursor');
+    sessionStorage.removeItem('lwhitecursor');
+    sessionStorage.removeItem('highlightlinks');
+    sessionStorage.removeItem('highlightheadings');
+    sessionStorage.removeItem('readablefont');
+    sessionStorage.removeItem('fontsize');
+    sessionStorage.removeItem('leftjustify');
+
+    clearBody();
+    return false;
+}
+
+function clearBody() {
+    //zoom
+    if ($('body').hasClass('ATBZoom75')) {
+        $('body').removeClass('ATBZoom75');
+    }
+    if ($('body').hasClass('ATBZoom100')) { 
+        $('body').removeClass('ATBZoom100');
+    }
+    if ($('body').hasClass('ATBZoom125')) {
+        $('body').removeClass('ATBZoom125');
+    }
+    if ($('body').hasClass('ATBZoom150')) {
+        $('body').removeClass('ATBZoom150');
+    }
+    if ($('body').hasClass('ATBZoom175')) {
+        $('body').removeClass('ATBZoom175');
+    }
+    if ($('body').hasClass('ATBZoom200')) {
+        $('body').removeClass('ATBZoom200');
+    }
+    if ($('body').hasClass('ATBZoom250')) {
+        $('body').removeClass('ATBZoom250');
+    }
+
+    //leftjustify
+    if ($('body').hasClass('ATBTextLeft')) {
+        $('body').removeClass('ATBTextLeft');
+    }
+
+    //improved font
+    if ($('body').hasClass('ATBsansFont')) {
+        $('body').removeClass('ATBsansFont');
+    }
+
+    //highlights
+    if ($('body').hasClass('ATBhighlight')) {
+        $('body').removeClass('ATBhighlight');
+    }
+
+    //cursors
+    if ($('body').hasClass('ATBLargeWhiteCursor')) {
+        $('body').removeClass('ATBLargeWhiteCursor');
+    }
+
+    if ($('body').hasClass('ATBLargeBlackCursor')) {
+        $('body').removeClass('ATBLargeBlackCursor');
+    }
+
+    //yellow on black
+    if ($('body').hasClass('ATByellowOnBlack')) {
+        $('body').removeClass('ATByellowOnBlack');
+    }
+
+    //black and white
+    if ($('body').hasClass('ATBblackAndWhite')) {
+        $('body').removeClass('ATBblackAndWhite');
+    }
+    //monochrome
+    if ($('body').hasClass('ATBmonochrome')) {
+        $('body').removeClass('ATBmonochrome');
+    }
+
+    //high contrast
+    if ($('body').hasClass('ATBdarkHighContrast')) {
+        $('body').removeClass('ATBdarkHighContrast');
+    }
+
+    if ($('body').hasClass('ATBbrightHighContrast')) {
+        $('body').removeClass('ATBbrightHighContrast');
+    }
+
+
+}
+
+/**********************************IMAGES************************************/
+function displayImageDescriptions() {
+
+}
+
+function getSize() {
+    
+    size = $("body").css("font-size");
+    size = parseInt(size, 10);
+    
+}
+
+//get inital font size
+getSize();
+
+$("#up").on("click", function () {
+
+    // parse font size, if less than 50 increase font size
+    if ((size + 2) <= 50) {
+        $("body").css("font-size", "+=2");
+        
+    }
+});
+
+$("#down").on("click", function () {
+    if ((size - 2) >= 12) {
+        $("body").css("font-size", "-=2");
+        
+    }
+});
+
