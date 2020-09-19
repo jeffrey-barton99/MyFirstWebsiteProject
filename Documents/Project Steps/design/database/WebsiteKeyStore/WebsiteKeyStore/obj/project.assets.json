@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\jeffr\\Desktop\\Retirement Prep 2020\\Skillbridge\\MSSA\\Course Project MyFirstWebPage\\MyFirstWebsiteProject\\Documents\\Project Steps\\WebsiteKeyStore\\WebsiteKeyStore\\WebsiteKeyStore.csproj",
+      "projectUniqueName": "C:\\Users\\jeffr\\Desktop\\Retirement Prep 2020\\Skillbridge\\MSSA\\Course Project MyFirstWebPage\\MyFirstWebsiteProject\\Documents\\Project Steps\\design\\database\\WebsiteKeyStore\\WebsiteKeyStore\\WebsiteKeyStore.csproj",
       "projectName": "WebsiteKeyStore",
-      "projectPath": "C:\\Users\\jeffr\\Desktop\\Retirement Prep 2020\\Skillbridge\\MSSA\\Course Project MyFirstWebPage\\MyFirstWebsiteProject\\Documents\\Project Steps\\WebsiteKeyStore\\WebsiteKeyStore\\WebsiteKeyStore.csproj",
+      "projectPath": "C:\\Users\\jeffr\\Desktop\\Retirement Prep 2020\\Skillbridge\\MSSA\\Course Project MyFirstWebPage\\MyFirstWebsiteProject\\Documents\\Project Steps\\design\\database\\WebsiteKeyStore\\WebsiteKeyStore\\WebsiteKeyStore.csproj",
       "packagesPath": "C:\\Users\\jeffr\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\jeffr\\Desktop\\Retirement Prep 2020\\Skillbridge\\MSSA\\Course Project MyFirstWebPage\\MyFirstWebsiteProject\\Documents\\Project Steps\\WebsiteKeyStore\\WebsiteKeyStore\\obj\\",
+      "outputPath": "C:\\Users\\jeffr\\Desktop\\Retirement Prep 2020\\Skillbridge\\MSSA\\Course Project MyFirstWebPage\\MyFirstWebsiteProject\\Documents\\Project Steps\\design\\database\\WebsiteKeyStore\\WebsiteKeyStore\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\jeffr\\AppData\\Roaming\\NuGet\\NuGet.Config",
