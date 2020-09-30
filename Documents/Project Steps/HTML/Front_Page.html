@@ -1,37 +1,76 @@
-﻿<!DOCTYPE html>
+﻿<!--START IMPORTING INTO MVC!!!first HTML assignments as notes to use for site pages.
+-->
+<!DOCTYPE html>
 <html>
 <body>
+    <div class="text-center">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+        <link rel="stylesheet" href="Site.css" />
 
-    <h1>TITLE centered and underlined (possible title "Eyanla's Den")</h1>
+        <style>
+            @font-face {
+                font-family: myFirstFont;
+                src: url(sansation_bold.woff);
+            }
 
-    <article>
-        <h2>User Name Field</h2>
-        <p>user login name. possibly try https://help.screensteps.com/a/1109644 for user and password.</p>
-    </article>
+            @font-face {
+                font-family: myFirstFont;
+                src: url(sansation_bold.woff);
+                font-weight: bold;
+            }
 
-    <article>
-        <h2>Password field</h2>
-        <p>user password.</p>
-    </article>
+            * {
+                font-family: myFirstFont;
+            }
+        </style>
 
-    <article>
-        <h2>Login Button will be here</h2>
-        <p>Takes the user to the Homepage once credentials are verified</p>
-    </article>
+        <h1>TITLE centered and underlined (possible title "Eyanla's Den")</h1>
 
-    <article>
-        <h2>New User button</h2>
-        <p>The words above will a button linked to "Registration" Page.</p>
-    </article>
+        <article>
+            <h2>User Name Field</h2>
+            <p>user login name. possibly try https://help.screensteps.com/a/1109644 for user and password.</p>
+            <form asp-action="Add">
+                <input type="text" name="userInput" />
+            </form>
+        </article>
 
-    <article>
-        <h2>Contact Us link</h2>
-        <p>The words above will be linked to "Contact Us" Page.</p>
-    </article>
+        <article>
+            <h2>Password field(not yet implimented)</h2>
+            <p>Enter Password.</p>
+            <form asp-action="Add">
+                <input type="text" name="userInput" />
+                <button type="submit">Enter The Den!</button>
+            </form>
+        </article>
 
-    <article>
-        <h2>About Site link</h2>
-        <p>The words above will be linked to "About Site" Page.</p>
-    </article>
+        <!--<article>
+            <h2>Login Button will be here</h2>
+            <p>Takes the user to the Homepage once credentials are verified</p>
+        </article>-->
+
+        <article>
+            <h2>New User button</h2>
+            <p>The words above will a button linked to "Registration" Page.</p>
+            <form asp-action="Add">
+                <button type="submit">New to the Den?</button>
+            </form>
+        </article>
+
+        <article>
+            <!--<h2>Contact Us link</h2>-->
+            <p>Linked to "Contact Us" Page.</p>
+            <form asp-action="Add">
+                <button type="submit">Contact Us!</button>
+            </form>
+        </article>
+
+        <article>
+            <h2>About Site link</h2>
+            <p>The words above will be linked to "About Site" Page.</p>
+            <form asp-action="Add">
+                <button type="submit">Get to know us!</button>
+            </form>
+        </article>
+    </div>
 </body>
 </html>

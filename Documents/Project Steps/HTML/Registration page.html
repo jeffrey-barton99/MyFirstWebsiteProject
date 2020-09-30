@@ -1,4 +1,4 @@
-﻿<!--first HTML assignments as notes to use for site pages.
+﻿<!--START IMPORTING INTO MVC!!!first HTML assignments as notes to use for site pages.
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -8,59 +8,104 @@
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
     <link rel="stylesheet" href="Site.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        img {
+            width: 45%;
+            height: auto;
+        }
+    </style>
 </head>
 
 <body>
     <div class="text-center">
+        <style>
+            @font-face 
+            {
+                font-family: myFirstFont;
+                src: url(sansation_bold.woff);
+            }
+            @font-face {
+                font-family: myFirstFont;
+                src: url(sansation_bold.woff);
+                font-weight: bold;
+            }
+
+            * {
+                font-family: myFirstFont;
+            }
+        </style>
         <div class="container">
             <h1>Eyanla's Den</h1>
             <h2>Quirky oneliner about the site goes here.</h2>
+                <img src="https://i.pinimg.com/736x/0c/ea/7c/0cea7cced39e4b08c03bf7e6aa1f4a3c.jpg" class="img-fluid" alt="catgirl"/>
 
             <div class="text-center">
-                <img src="https://i.pinimg.com/736x/0c/ea/7c/0cea7cced39e4b08c03bf7e6aa1f4a3c.jpg" class="img-fluid" alt="catgirl" />
 
                 <p style="margin-top:0.5rem;">
                     A place for comic book and anime lovers can gather and  <span style="color:aquamarine;">share</span>.
                     Above image by Kalanji vision. https://www.pinterest.com/Kalanji/
                 </p>
             </div>
-            <article>
+            <!--<article>
                 <h2>All below are fields not buttons except for the "Enter Button"</h2>
 
-            </article>
+            </article>-->
+           <article>
+                    <h2>All buttons and fields are placeholders.</h2>
             <article>
-                <h2>New username</h2>
+                <h2>Enter New Username</h2>
                 <p>user login name. possibly try https://help.screensteps.com/a/1109644 for new username||email address</p>
             </article>
-
+            <form asp-action="Add">
+                <input type="text" name="userInput" />
+                <button type="submit">Add!</button>
+            </form>
             <article>
-                <h2>age verification</h2>
-                <p>only asking if 18 or older. exact age not required.</p>
+                <h2>Age verification</h2>
+                <p>Over 18? (input yes or no.)</p>
             </article>
+            <form asp-action="Add">
+                <input type="text" name="userInput" />
+                <button type="submit">Save!</button>
+            </form>
 
             <article>
                 <h2>Otaku?</h2>
                 <p>popup yes, no, what's an otaku? as selectible options</p>
+                <form asp-action="Add">
+                    <button type="submit">Yes!</button> <button type="submit">No.</button> <button type="submit">Nani???</button>
+                </form>
             </article>
 
             <article>
                 <h2>Other hobbies?</h2>
-                <p>optional entry for new user's additional hobbies.</p>
-            </article>
+                <p>optional entry for new user's additional hobbies. Ie Art, writing, music...</p>
 
+            </article>
+            <form asp-action="Add">
+                <input type="text" name="userInput" />
+                <button type="submit">Save!</button>
+            </form>
             <article>
                 <h2>Password entry</h2>
-                <p>Does it meet requirements possibly try https://help.screensteps.com/a/1109644 for user and password.</p>
+                <p>Not yet implimented. https://help.screensteps.com/a/1109644 for user and password.</p>
             </article>
 
             <article>
                 <h2>Verify password just enterd above.</h2>
-                <p>possibly try https://help.screensteps.com/a/1109644 for user and password.</p>
+                <p>Not yet implimented. possibly try https://help.screensteps.com/a/1109644 for user and password.</p>
             </article>
 
-            <article>
-                <h2>Enter Button</h2>
-                <p>Saves user's info, creates account, and takes user to the Home Page.</p>
-            </article>
+            <form asp-action="Add">
+                <button type="submit">Save!</button>
+            </form>
+           </article>
+            <!--<article>
+        <h2>Enter Button</h2>
+        <p>Saves user's info, creates account, and takes user to the Home Page.</p>
+    </article>-->
+        </div>
+    </div>
 </body>
 </html>
