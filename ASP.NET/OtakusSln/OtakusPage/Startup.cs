@@ -30,8 +30,8 @@ namespace OtakusPage
 
             app.UseEndpoints(endpoints =>
             {
-            endpoints.MapDefaultControllerRoute();
-        });
+                endpoints.MapDefaultControllerRoute();
+            });
         }
-}
+    }
 }

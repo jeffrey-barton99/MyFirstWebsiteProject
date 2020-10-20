@@ -2,7 +2,7 @@
 
 namespace OtakusPage.Controllers
 {
-    public class OtakusPage : Controller
+    public class HomeController : Controller
     {
         public IActionResult Index() => View();
     }
