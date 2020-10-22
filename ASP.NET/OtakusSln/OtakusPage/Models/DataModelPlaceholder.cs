@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations.Schema;
 //see MVC template and find key value store
+//placeholder for webpage keystore to be created
 namespace OtakusPage.Models
 {
     public class Product
