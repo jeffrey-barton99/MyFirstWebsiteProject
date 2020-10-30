@@ -11,9 +11,9 @@ namespace OtakusPage.Models
     {
         public PageDbContext(DbContextOptions<PageDbContext> options) : base(options) { }
         
-        public DbSet<Form> Form { get; set; }
-        public DbSet<AccountCreationDate> AccountCreationDate { get; set; }
-        public DbSet<UserProfile> UserProfile { get; set; }
+        public DbSet<Form> Forms { get; set; }
+        public DbSet<AccountCreationDate> AccountCreationDates { get; set; }
+        public DbSet<UserProfile> UserProfiles { get; set; }
 
     }
 }

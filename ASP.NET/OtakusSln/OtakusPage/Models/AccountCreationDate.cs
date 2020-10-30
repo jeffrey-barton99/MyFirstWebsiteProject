@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.VisualBasic;
 //see MVC template and find key value store
 namespace OtakusPage.Models
 {
@@ -11,8 +12,8 @@ namespace OtakusPage.Models
         public long AccountCreationDateID { get; set; }
 
         [Column(TypeName = "decimal(8, 2)")]
-        public decimal DateAccountCreated { get; set; }
-        public decimal DateOfFirstForm { get; set; }
+        public DateFormat DateAccountCreated { get; set; }
+        public DateFormat DateOfFirstForm { get; set; }
         //category = Manga or Anime
         public string Category { get; set; }
 
