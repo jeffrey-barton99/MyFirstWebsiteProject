@@ -45,6 +45,8 @@ namespace OtakusPage.Models
 
                 //TODO: Need to code this to be user entered data
                 //TODO: https://www.wikihow.com/Create-HTML-Forms
+                //TODO: Incorporate tutorial from https://medium.com/net-core/building-a-web-application-using-asp-net-core-mvc-and-entity-framework-core-15ee6192b3f3
+                //TODO: 
                 new Form
                 {
                     Title = "Title goes here",

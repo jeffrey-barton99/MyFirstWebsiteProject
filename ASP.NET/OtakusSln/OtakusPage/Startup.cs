@@ -44,6 +44,7 @@ namespace OtakusPage
             {
                 endpoints.MapDefaultControllerRoute();
             });
+            SeedData.EnsurePopulated(app);
         }
     }
 }
