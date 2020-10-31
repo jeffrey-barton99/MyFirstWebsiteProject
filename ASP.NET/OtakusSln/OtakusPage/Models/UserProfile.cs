@@ -24,6 +24,7 @@ namespace OtakusPage.Models
         //category = Manga or Anime
         public string Category { get; set; }
 
+        //TODO: Login will be handled seperately
         //Stretch goal
         //User uploaded cover art something like
         // public "pic" picThumbnail { get; set; }
