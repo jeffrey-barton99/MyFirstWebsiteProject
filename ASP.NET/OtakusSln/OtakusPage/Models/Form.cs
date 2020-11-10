@@ -11,6 +11,7 @@ namespace OtakusPage.Models
     {
         public long FormID { get; set; }
         public string Title { get; set; }
+        // rating, imdburl etc
         public string Author { get; set; }
         public string Mangaka { get; set; }
         public string Description { get; set; }
@@ -19,7 +20,7 @@ namespace OtakusPage.Models
         public DateFormat DatePublished { get; set; }
         public DateFormat DateRead { get; set; }
         //category = Manga or Anime
-        public string Category { get; set; }
+        public Category Category { get; set; }
 
         //Stretch goal
         //User uploaded cover art something like
